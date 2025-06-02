@@ -11,7 +11,7 @@ const router = express.Router();
 router.route("/").get(async (req, res, next) => {
   try {
     const employees = await getEmployees();
-    res.status(200).json({ employees });
+    res.status(200).send(employees);
   } catch (error) {
     next(error);
   }
@@ -19,12 +19,11 @@ router.route("/").get(async (req, res, next) => {
 
 router.route("/").post(async (req, res, next) => {
   try {
-    const name = req.body.name;
-    const birthday = req.body.birthday;
-    const salary = req.body.salary;
+    const name = req.body?.name;
+    const birthday = req.body?.birthday;
+    const salary = req.body?.salary;
 
-    // check if req.body is an empty {}
-    if (Object.keys(req.body).length === 0) {
+    if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({ error: "request body is not provided." });
     }
 
@@ -36,7 +35,7 @@ router.route("/").post(async (req, res, next) => {
     }
 
     const newEmployee = await createEmployee({ name, birthday, salary });
-    res.status(201).json({ newEmployee });
+    res.status(201).send(newEmployee);
   } catch (error) {
     next(error);
   }
@@ -61,7 +60,7 @@ router.route("/:id").get(async (req, res, next) => {
         .json({ error: `employee with id ${id} does not exist.` });
     }
 
-    res.status(200).json({ employee });
+    res.status(200).send(employee);
   } catch (error) {
     next(error);
   }
@@ -96,12 +95,11 @@ router.route("/:id").delete(async (req, res, next) => {
 router.route("/:id").put(async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const name = req.body.name;
-    const birthday = req.body.birthday;
-    const salary = req.body.salary;
+    const name = req.body?.name;
+    const birthday = req.body?.birthday;
+    const salary = req.body?.salary;
 
-    // check if req.body is an empty {}
-    if (Object.keys(req.body).length === 0) {
+    if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({ error: "request body is not provided." });
     }
 
@@ -133,7 +131,7 @@ router.route("/:id").put(async (req, res, next) => {
       birthday,
       salary,
     });
-    res.status(200).json({ updatedEmployee });
+    res.status(200).send(updatedEmployee);
   } catch (error) {
     next(error);
   }

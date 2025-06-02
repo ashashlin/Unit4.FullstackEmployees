@@ -37,7 +37,13 @@ export async function getEmployees() {
  * @returns undefined if employee with the given id does not exist
  */
 export async function getEmployee(id) {
-  // TODO
+  const sql = `
+    SELECT * FROM employees
+    WHERE id = $1;
+  `;
+  const { rows } = await db.query(sql, [id]);
+
+  return rows[0];
 }
 
 /**

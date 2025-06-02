@@ -1,6 +1,9 @@
 import express from "express";
-
-import { createEmployee, getEmployees } from "#db/queries/employees";
+import {
+  createEmployee,
+  deleteEmployee,
+  getEmployees,
+} from "#db/queries/employees";
 
 const router = express.Router();
 
@@ -39,24 +42,54 @@ router.route("/").post(async (req, res, next) => {
 });
 
 router.route("/:id").get(async (req, res, next) => {
-  const id = Number(req.params.id);
+  try {
+    const id = Number(req.params.id);
 
-  if (id < 0) {
-    return res
-      .status(400)
-      .json({ error: "employee id has to be a positive integer." });
+    if (id < 0) {
+      return res
+        .status(400)
+        .json({ error: "employee id has to be a positive integer." });
+    }
+
+    const employees = await getEmployees();
+    const employee = employees.find((employee) => employee.id === id);
+
+    if (!employee) {
+      return res
+        .status(404)
+        .json({ error: `employee with id ${id} does not exist.` });
+    }
+
+    res.status(200).json({ employee });
+  } catch (error) {
+    next(error);
   }
+});
 
-  const employees = await getEmployees();
-  const employee = employees.find((employee) => employee.id === id);
+router.route("/:id").delete(async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
 
-  if (!employee) {
-    return res
-      .status(404)
-      .json({ error: `employee with id ${id} does not exist.` });
+    if (id < 0) {
+      return res
+        .status(400)
+        .json({ error: "employee id has to be a positive integer." });
+    }
+
+    const employees = await getEmployees();
+    const employee = employees.find((employee) => employee.id === id);
+
+    if (!employee) {
+      return res
+        .status(404)
+        .json({ error: `employee with id ${id} does not exist.` });
+    }
+
+    await deleteEmployee(id);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
   }
-
-  res.status(200).json({ employee });
 });
 
 export default router;

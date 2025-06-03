@@ -4,7 +4,7 @@ export default async function validateEmployeeId(req, res, next) {
   try {
     const id = Number(req.params.id);
 
-    if (id < 0) {
+    if (id <= 0) {
       return res
         .status(400)
         .json({ error: "employee id has to be a positive integer." });
